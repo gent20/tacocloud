@@ -31,5 +31,3 @@ public class HomeControllerTest {
                         containsString("Welcome to...")));
     }
 }
-
-}
