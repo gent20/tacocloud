@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import spring.tacocloud.model.Ingredient;
 import spring.tacocloud.model.Taco;
 
+import javax.validation.Valid;
+
 
 @Slf4j
 @Controller
@@ -44,9 +46,11 @@ public class DesignTacoController {
     }
 
     @PostMapping
-    public String processDesign(Design design) {
-    // Save the taco design...
-    // We'll do this in chapter 3
+    public String processDesign(@Valid Taco design,Errors errors){
+        if (errors.hasErrors()) {
+            return "design";
+        }
+
         log.info("Processing design: " + design);
         return "redirect:/orders/current";
     }
