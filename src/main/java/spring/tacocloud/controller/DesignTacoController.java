@@ -19,36 +19,37 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/design")
+//end::injectingIngredientRepository[]
 @SessionAttributes("order")
+//tag::injectingIngredientRepository[]
 public class DesignTacoController {
 
     private final IngredientRepository ingredientRepo;
 
-    private TacoRepository designRepo;
+    //end::injectingIngredientRepository[]
+    private final TacoRepository tacoRepo;
 
     @Autowired
     public DesignTacoController(
             IngredientRepository ingredientRepo,
-            TacoRepository designRepo) {
+            TacoRepository tacoRepo) {
         this.ingredientRepo = ingredientRepo;
-        this.designRepo = designRepo;
+        this.tacoRepo = tacoRepo;
     }
 
-    //end::bothRepoCtor[]
-
-    // tag::modelAttributes[]
     @ModelAttribute(name = "order")
     public Order order() {
         return new Order();
     }
 
-    @ModelAttribute(name = "taco")
-    public Taco taco() {
+    @ModelAttribute(name = "design")
+    public Taco design() {
         return new Taco();
     }
 
-    // end::modelAttributes[]
-    // tag::showDesignForm[]
+    //end::injectingDesignRepository[]
+
+    //tag::injectingIngredientRepository[]
 
     @GetMapping
     public String showDesignForm(Model model) {
@@ -63,24 +64,25 @@ public class DesignTacoController {
 
         return "design";
     }
-//end::showDesignForm[]
+    //end::injectingIngredientRepository[]
 
-    //tag::processDesign[]
+    //tag::injectingDesignRepository[]
     @PostMapping
     public String processDesign(
-            @Valid Taco design, Errors errors,
+            @Valid Taco taco, Errors errors,
             @ModelAttribute Order order) {
 
         if (errors.hasErrors()) {
             return "design";
         }
 
-        Taco saved = designRepo.save(design);
+        Taco saved = tacoRepo.save(taco);
         order.addDesign(saved);
 
         return "redirect:/orders/current";
     }
-    //end::processDesign[]
+
+//end::injectingDesignRepository[]
 
     private List<Ingredient> filterByType(
             List<Ingredient> ingredients, Ingredient.Type type) {
@@ -89,4 +91,16 @@ public class DesignTacoController {
                 .filter(x -> x.getType().equals(type))
                 .collect(Collectors.toList());
     }
+
+  /*
+  //tag::injectingDesignRepository[]
+  //tag::injectingIngredientRepository[]
+   ...
+  //end::injectingIngredientRepository[]
+  //end::injectingDesignRepository[]
+  */
+
+//tag::injectingDesignRepository[]
+//tag::injectingIngredientRepository[]
+
 }

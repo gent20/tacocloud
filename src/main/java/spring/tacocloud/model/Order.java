@@ -17,26 +17,29 @@ import java.util.List;
 @Table(name="Taco_Order")
 public class Order implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
     private Date placedAt;
 
-    @NotBlank(message="Name is required")
-    private String name;
+    //end::allButDetailProperties[]
+    @NotBlank(message="Delivery name is required")
+    private String deliveryName;
 
     @NotBlank(message="Street is required")
-    private String street;
+    private String deliveryStreet;
 
     @NotBlank(message="City is required")
-    private String city;
+    private String deliveryCity;
 
     @NotBlank(message="State is required")
-    private String state;
+    private String deliveryState;
 
-    @NotBlank(message="Zip Code is required")
-    private String zip;
+    @NotBlank(message="Zip code is required")
+    private String deliveryZip;
 
     @CreditCardNumber(message="Not a valid credit card number")
     private String ccNumber;
@@ -48,14 +51,17 @@ public class Order implements Serializable {
     @Digits(integer=3, fraction=0, message="Invalid CVV")
     private String ccCVV;
 
+
     @ManyToMany(targetEntity=Taco.class)
     private List<Taco> tacos = new ArrayList<>();
 
     public void addDesign(Taco design) {
         this.tacos.add(design);
     }
+
     @PrePersist
     void placedAt() {
         this.placedAt = new Date();
     }
+
 }
