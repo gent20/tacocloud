@@ -1,4 +1,4 @@
-package spring.tacocloud.service;
+package spring.tacocloud.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
