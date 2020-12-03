@@ -1,106 +1,35 @@
 package spring.tacocloud.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.*;
-import spring.tacocloud.model.Ingredient;
-import spring.tacocloud.model.Order;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.server.EntityLinks;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import spring.tacocloud.model.Taco;
-import spring.tacocloud.repository.IngredientRepository;
 import spring.tacocloud.repository.TacoRepository;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
-
-@Controller
-@RequestMapping("/design")
-//end::injectingIngredientRepository[]
-@SessionAttributes("order")
-//tag::injectingIngredientRepository[]
+@RestController
+@RequestMapping(path="/design", produces="application/json")
+@CrossOrigin(origins="*")
 public class DesignTacoController {
 
-    private final IngredientRepository ingredientRepo;
-
-    //end::injectingIngredientRepository[]
-    private final TacoRepository tacoRepo;
+    private TacoRepository tacoRepo;
 
     @Autowired
-    public DesignTacoController(
-            IngredientRepository ingredientRepo,
-            TacoRepository tacoRepo) {
-        this.ingredientRepo = ingredientRepo;
+    EntityLinks entityLinks;
+
+    public DesignTacoController(TacoRepository tacoRepo) {
         this.tacoRepo = tacoRepo;
     }
 
-    @ModelAttribute(name = "order")
-    public Order order() {
-        return new Order();
+    @GetMapping("/recent")
+    public Iterable<Taco> recentTacos() {
+        PageRequest page = PageRequest.of(
+                0, 12, Sort.by("createdAt").descending());
+        return tacoRepo.findAll(page).getContent();
     }
-
-    @ModelAttribute(name = "design")
-    public Taco design() {
-        return new Taco();
-    }
-
-    //end::injectingDesignRepository[]
-
-    //tag::injectingIngredientRepository[]
-
-    @GetMapping
-    public String showDesignForm(Model model) {
-        List<Ingredient> ingredients = new ArrayList<>();
-        ingredientRepo.findAll().forEach(i -> ingredients.add(i));
-
-        Ingredient.Type[] types = Ingredient.Type.values();
-        for (Ingredient.Type type : types) {
-            model.addAttribute(type.toString().toLowerCase(),
-                    filterByType(ingredients, type));
-        }
-
-        return "design";
-    }
-    //end::injectingIngredientRepository[]
-
-    //tag::injectingDesignRepository[]
-    @PostMapping
-    public String processDesign(
-            @Valid Taco taco, Errors errors,
-            @ModelAttribute Order order) {
-
-        if (errors.hasErrors()) {
-            return "design";
-        }
-
-        Taco saved = tacoRepo.save(taco);
-        order.addDesign(saved);
-
-        return "redirect:/orders/current";
-    }
-
-//end::injectingDesignRepository[]
-
-    private List<Ingredient> filterByType(
-            List<Ingredient> ingredients, Ingredient.Type type) {
-        return ingredients
-                .stream()
-                .filter(x -> x.getType().equals(type))
-                .collect(Collectors.toList());
-    }
-
-  /*
-  //tag::injectingDesignRepository[]
-  //tag::injectingIngredientRepository[]
-   ...
-  //end::injectingIngredientRepository[]
-  //end::injectingDesignRepository[]
-  */
-
-//tag::injectingDesignRepository[]
-//tag::injectingIngredientRepository[]
-
 }
